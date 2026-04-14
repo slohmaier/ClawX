@@ -3,7 +3,7 @@
  * Renders user / assistant / system / toolresult messages
  * with markdown, thinking sections, images, and tool cards.
  */
-import { useState, useCallback, useEffect, memo } from 'react';
+import { useState, useCallback, useEffect, memo, useId } from 'react';
 import { Sparkles, Copy, Check, ChevronDown, ChevronRight, Wrench, FileText, Film, Music, FileArchive, File, X, FolderOpen, ZoomIn, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -284,10 +284,13 @@ function ToolStatusBar({
               isError && 'border-destructive/30 bg-destructive/5 text-destructive',
             )}
           >
-            {isRunning && <Loader2 className="h-3.5 w-3.5 animate-spin text-primary shrink-0" />}
-            {!isRunning && !isError && <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />}
-            {isError && <AlertCircle className="h-3.5 w-3.5 text-destructive shrink-0" />}
-            <Wrench className="h-3 w-3 shrink-0 opacity-60" />
+            {isRunning && <Loader2 className="h-3.5 w-3.5 animate-spin text-primary shrink-0" aria-hidden="true" />}
+            {!isRunning && !isError && <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" aria-hidden="true" />}
+            {isError && <AlertCircle className="h-3.5 w-3.5 text-destructive shrink-0" aria-hidden="true" />}
+            <Wrench className="h-3 w-3 shrink-0 opacity-60" aria-hidden="true" />
+            <span className="sr-only">
+              {isError ? 'Error' : isRunning ? 'Running' : 'Completed'}:
+            </span>
             <span className="font-mono text-[12px] font-medium">{tool.name}</span>
             {duration && <span className="text-[11px] opacity-60">{tool.summary ? `(${duration})` : duration}</span>}
             {tool.summary && (
@@ -386,7 +389,10 @@ function MessageBubble({
             {text}
           </ReactMarkdown>
           {isStreaming && (
-            <span className="inline-block w-2 h-4 bg-foreground/50 animate-pulse ml-0.5" />
+            <>
+              <span className="inline-block w-2 h-4 bg-foreground/50 animate-pulse ml-0.5" aria-hidden="true" />
+              <span className="sr-only" role="status" aria-live="polite">Assistant is typing</span>
+            </>
           )}
         </div>
       )}
@@ -399,18 +405,21 @@ function MessageBubble({
 
 function ThinkingBlock({ content }: { content: string }) {
   const [expanded, setExpanded] = useState(false);
+  const contentId = useId();
 
   return (
     <div className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-[14px]">
       <button
         className="flex items-center gap-2 w-full px-3 py-2 text-muted-foreground hover:text-foreground transition-colors"
         onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+        aria-controls={contentId}
       >
-        {expanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+        {expanded ? <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" /> : <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />}
         <span className="font-medium">Thinking</span>
       </button>
       {expanded && (
-        <div className="px-3 pb-3 text-muted-foreground">
+        <div id={contentId} className="px-3 pb-3 text-muted-foreground">
           <div className="prose prose-sm dark:prose-invert max-w-none opacity-75">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
           </div>
@@ -609,20 +618,24 @@ function ImageLightbox({
 
 function ToolCard({ name, input }: { name: string; input: unknown }) {
   const [expanded, setExpanded] = useState(false);
+  const contentId = useId();
 
   return (
     <div className="rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-[14px]">
       <button
         className="flex items-center gap-2 w-full px-3 py-1.5 text-muted-foreground hover:text-foreground transition-colors"
         onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+        aria-controls={contentId}
+        aria-label={`Tool call: ${name}`}
       >
-        <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" />
-        <Wrench className="h-3 w-3 shrink-0 opacity-60" />
+        <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" aria-hidden="true" />
+        <Wrench className="h-3 w-3 shrink-0 opacity-60" aria-hidden="true" />
         <span className="font-mono text-xs">{name}</span>
-        {expanded ? <ChevronDown className="h-3 w-3 ml-auto" /> : <ChevronRight className="h-3 w-3 ml-auto" />}
+        {expanded ? <ChevronDown className="h-3 w-3 ml-auto" aria-hidden="true" /> : <ChevronRight className="h-3 w-3 ml-auto" aria-hidden="true" />}
       </button>
       {expanded && input != null && (
-        <pre className="px-3 pb-2 text-xs text-muted-foreground overflow-x-auto">
+        <pre id={contentId} className="px-3 pb-2 text-xs text-muted-foreground overflow-x-auto">
           {typeof input === 'string' ? input : JSON.stringify(input, null, 2) as string}
         </pre>
       )}

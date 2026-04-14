@@ -239,11 +239,13 @@ export function Sidebar() {
           size="icon"
           className="h-8 w-8 shrink-0 text-muted-foreground hover:bg-black/5 dark:hover:bg-white/10"
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-expanded={!sidebarCollapsed}
         >
           {sidebarCollapsed ? (
-            <PanelLeft className="h-[18px] w-[18px]" />
+            <PanelLeft className="h-[18px] w-[18px]" aria-hidden="true" />
           ) : (
-            <PanelLeftClose className="h-[18px] w-[18px]" />
+            <PanelLeftClose className="h-[18px] w-[18px]" aria-hidden="true" />
           )}
         </Button>
       </div>
@@ -320,11 +322,11 @@ export function Sidebar() {
                         }}
                         className={cn(
                           'absolute right-1 flex items-center justify-center rounded p-0.5 transition-opacity',
-                          'opacity-0 group-hover:opacity-100',
+                          'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100',
                           'text-muted-foreground hover:text-destructive hover:bg-destructive/10',
                         )}
                       >
-                        <Trash2 className="h-3.5 w-3.5" />
+                        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                       </button>
                     </div>
                   );

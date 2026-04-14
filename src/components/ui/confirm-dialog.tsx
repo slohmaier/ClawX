@@ -30,6 +30,8 @@ export function ConfirmDialog({
   onError,
 }: ConfirmDialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
+  const previousActiveElementRef = useRef<HTMLElement | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [prevOpen, setPrevOpen] = useState(open);
 
@@ -42,8 +44,12 @@ export function ConfirmDialog({
   }
 
   useEffect(() => {
-    if (open && cancelRef.current) {
-      cancelRef.current.focus();
+    if (open) {
+      previousActiveElementRef.current = (document.activeElement as HTMLElement) ?? null;
+      if (cancelRef.current) cancelRef.current.focus();
+    } else if (previousActiveElementRef.current) {
+      previousActiveElementRef.current.focus();
+      previousActiveElementRef.current = null;
     }
   }, [open]);
 
@@ -53,6 +59,18 @@ export function ConfirmDialog({
     if (e.key === 'Escape' && !confirming) {
       e.preventDefault();
       onCancel();
+      return;
+    }
+    // Minimal focus trap: cycle between Cancel and Confirm buttons
+    if (e.key === 'Tab') {
+      const active = document.activeElement;
+      if (e.shiftKey && active === cancelRef.current) {
+        e.preventDefault();
+        confirmRef.current?.focus();
+      } else if (!e.shiftKey && active === confirmRef.current) {
+        e.preventDefault();
+        cancelRef.current?.focus();
+      }
     }
   };
 
@@ -77,6 +95,7 @@ export function ConfirmDialog({
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-dialog-title"
+      aria-describedby="confirm-dialog-message"
       onKeyDown={handleKeyDown}
     >
       <div
@@ -89,7 +108,7 @@ export function ConfirmDialog({
         <h2 id="confirm-dialog-title" className="text-lg font-semibold">
           {title}
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">{message}</p>
+        <p id="confirm-dialog-message" className="mt-2 text-sm text-muted-foreground">{message}</p>
         <div className="mt-6 flex justify-end gap-2">
           <Button
             ref={cancelRef}
@@ -100,6 +119,7 @@ export function ConfirmDialog({
             {cancelLabel}
           </Button>
           <Button
+            ref={confirmRef}
             variant={variant === 'destructive' ? 'destructive' : 'default'}
             onClick={handleConfirm}
             disabled={confirming}
