@@ -59,7 +59,13 @@
         "stop": "停止",
         "gatewayConnected": "接続済み",
         "gatewayStatus": "ゲートウェイ {{state}} | ポート: {{port}} {{pid}}",
-        "retryFailedAttachments": "失敗した添付を再試行"
+        "retryFailedAttachments": "失敗した添付を再試行",
+        "a11y": {
+            "inputLabel": "メッセージ",
+            "inputHint": "Enter で送信、Shift+Enter で改行、@ でエージェントをメンション。",
+            "attachments": "添付ファイル",
+            "removeAttachment": "添付ファイル {{name}} を削除"
+        }
     },
     "historyBuckets": {
         "today": "今日",
@@ -68,5 +74,30 @@
         "withinTwoWeeks": "2週間以内",
         "withinMonth": "1か月以内",
         "older": "1か月より前"
+    },
+    "a11y": {
+        "log": "チャットメッセージ",
+        "message": {
+            "author": {
+                "user": "あなた",
+                "assistant": "アシスタント",
+                "system": "システム"
+            }
+        },
+        "streaming": {
+            "typing": "アシスタントが入力中"
+        },
+        "tool": {
+            "running": "ツール実行中:",
+            "success": "ツール完了:",
+            "error": "ツール失敗:"
+        },
+        "codeBlock": "コードブロック ({{lang}})",
+        "codeBlockPlain": "コードブロック",
+        "copyCode": "コードをクリップボードへコピー",
+        "attachmentImage": "画像添付: {{name}}",
+        "thinking": {
+            "toggle": "思考プロセスを表示"
+        }
     }
 }

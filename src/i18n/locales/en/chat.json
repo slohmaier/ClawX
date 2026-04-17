@@ -59,7 +59,13 @@
         "stop": "Stop",
         "gatewayConnected": "connected",
         "gatewayStatus": "gateway {{state}} | port: {{port}} {{pid}}",
-        "retryFailedAttachments": "Retry failed attachments"
+        "retryFailedAttachments": "Retry failed attachments",
+        "a11y": {
+            "inputLabel": "Message",
+            "inputHint": "Press Enter to send, Shift+Enter for a new line, @ to mention an agent.",
+            "attachments": "Attachments",
+            "removeAttachment": "Remove attachment {{name}}"
+        }
     },
     "historyBuckets": {
         "today": "Today",
@@ -68,5 +74,30 @@
         "withinTwoWeeks": "Within 2 Weeks",
         "withinMonth": "Within 1 Month",
         "older": "Older than 1 Month"
+    },
+    "a11y": {
+        "log": "Chat messages",
+        "message": {
+            "author": {
+                "user": "You",
+                "assistant": "Assistant",
+                "system": "System"
+            }
+        },
+        "streaming": {
+            "typing": "Assistant is typing"
+        },
+        "tool": {
+            "running": "Tool running:",
+            "success": "Tool completed:",
+            "error": "Tool failed:"
+        },
+        "codeBlock": "Code block, {{lang}}",
+        "codeBlockPlain": "Code block",
+        "copyCode": "Copy code to clipboard",
+        "attachmentImage": "Image attachment: {{name}}",
+        "thinking": {
+            "toggle": "Show chain-of-thought"
+        }
     }
 }

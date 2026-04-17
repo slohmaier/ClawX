@@ -70,6 +70,7 @@
         "accountIdExists": "Account ID {{accountId}} already exists"
     },
     "dialog": {
+        "close": "Close dialog",
         "updateTitle": "Update {{name}}",
         "configureTitle": "Configure {{name}}",
         "addTitle": "Add Channel",

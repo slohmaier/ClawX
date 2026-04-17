@@ -548,6 +548,76 @@ async function loadMissingPreviews(messages: RawMessage[]): Promise<boolean> {
   }
 }
 
+/**
+ * True for session keys that represent heartbeat runs (internal agent pings
+ * the gateway schedules). Heartbeat keys are `<baseSessionKey>:heartbeat`,
+ * possibly chained (`:heartbeat:heartbeat`) when the isolated session itself
+ * hosts further heartbeats. These sessions clutter the sidebar because they
+ * are not user-initiated chats.
+ */
+function isHeartbeatSessionKey(sessionKey: string): boolean {
+  if (!sessionKey) return false;
+  return /(^|:)heartbeat(?::heartbeat)*$/i.test(sessionKey);
+}
+
+/**
+ * True when the gateway's `origin` metadata marks this session as driven by
+ * heartbeat traffic — even when the key itself looks like a regular user
+ * session. Covers the 2026.4.15+ case where heartbeat delivers through the
+ * main session and labels the entry with `origin.provider === 'heartbeat'`
+ * or `origin.from === 'heartbeat'`.
+ */
+function isHeartbeatOriginSession(session: { origin?: { provider?: string; from?: string; to?: string; label?: string } }): boolean {
+  const o = session.origin;
+  if (!o) return false;
+  const tag = (v?: string) => v?.toLowerCase() === 'heartbeat';
+  return tag(o.provider) || tag(o.from) || tag(o.label);
+}
+
+/**
+ * True for subagent session keys. Subagents are child sessions spawned by an
+ * agent via the `sessions_spawn` tool — they execute delegated subtasks and
+ * should not surface in the user-facing chat list.
+ *
+ * Key shape (from openclaw): either the raw key starts with `subagent:` OR,
+ * for agent-scoped keys `agent:<id>:<rest>`, the `<rest>` portion starts with
+ * `subagent:`. We also treat any key containing `:subagent:` as a subagent
+ * descendant (nested spawns).
+ */
+function isSubagentSessionKey(sessionKey: string): boolean {
+  if (!sessionKey) return false;
+  const lower = sessionKey.toLowerCase();
+  if (lower.startsWith('subagent:')) return true;
+  if (lower.includes(':subagent:')) return true;
+  return false;
+}
+
+/**
+ * Filter predicate: keep only sessions appropriate for the sidebar chat list.
+ *
+ * We drop three categories:
+ *   1. Keys ending in `:heartbeat` (isolated heartbeat runs)
+ *   2. Keys starting with or containing `:subagent:`
+ *   3. Sessions whose gateway `origin` metadata marks them as heartbeat-driven
+ *      (the 2026.4.15+ case where heartbeat writes into a normal-looking
+ *      session but labels the entry's origin as `heartbeat`).
+ *
+ * We intentionally do NOT filter the primary `agent:<id>:main` session even
+ * when it carries heartbeat origin — that would hide the user's only
+ * entry-point chat. Main sessions are always kept so the user can interact.
+ */
+function isUserFacingSession(session: {
+  key: string;
+  origin?: { provider?: string; from?: string; to?: string; label?: string };
+}): boolean {
+  if (isHeartbeatSessionKey(session.key)) return false;
+  if (isSubagentSessionKey(session.key)) return false;
+  // Never hide the main session — that would leave the user with nothing.
+  const isMain = session.key.endsWith(':main');
+  if (!isMain && isHeartbeatOriginSession(session)) return false;
+  return true;
+}
+
 function getCanonicalPrefixFromSessions(sessions: ChatSession[]): string | null {
   const canonical = sessions.find((s) => s.key.startsWith('agent:'))?.key;
   if (!canonical) return null;
@@ -855,6 +925,10 @@ export {
   upsertToolStatuses,
   hasNonToolAssistantContent,
   isToolOnlyMessage,
+  isHeartbeatSessionKey,
+  isHeartbeatOriginSession,
+  isSubagentSessionKey,
+  isUserFacingSession,
   setHistoryPollTimer,
   hasErrorRecoveryTimer,
   setErrorRecoveryTimer,

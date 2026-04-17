@@ -38,6 +38,19 @@ export interface ContentBlock {
   content?: unknown;
 }
 
+/**
+ * Subset of the gateway's `entry.origin` shape we care about for filtering.
+ * The gateway returns many more fields, but the sidebar only needs the ones
+ * that distinguish heartbeat/subagent traffic from user-initiated chats.
+ */
+export interface ChatSessionOrigin {
+  provider?: string;
+  from?: string;
+  to?: string;
+  surface?: string;
+  label?: string;
+}
+
 /** Session from sessions.list */
 export interface ChatSession {
   key: string;
@@ -46,6 +59,8 @@ export interface ChatSession {
   thinkingLevel?: string;
   model?: string;
   updatedAt?: number;
+  /** Gateway-reported origin metadata — used to hide heartbeat-driven sessions. */
+  origin?: ChatSessionOrigin;
 }
 
 export interface ToolStatus {

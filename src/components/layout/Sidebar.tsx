@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils';
 import { rendererExtensionRegistry } from '@/extensions/registry';
 import { useSettingsStore } from '@/stores/settings';
 import { useChatStore } from '@/stores/chat';
+import { isUserFacingSession } from '@/stores/chat/helpers';
 import { useGatewayStore } from '@/stores/gateway';
 import { useAgentsStore } from '@/stores/agents';
 import { Button } from '@/components/ui/button';
@@ -202,7 +203,13 @@ export function Sidebar() {
     (typeof sessionBuckets)[number]
   >;
 
-  for (const session of [...sessions].sort((a, b) =>
+  // Hide heartbeat + subagent sessions from the sidebar list. They are
+  // internal plumbing (periodic pings, spawned sub-tasks) and only confuse
+  // users looking for their own chats. The underlying transcripts are still
+  // on disk and reachable via explicit tools — we just don't surface them
+  // in the primary navigation.
+  const visibleSessions = sessions.filter(isUserFacingSession);
+  for (const session of [...visibleSessions].sort((a, b) =>
     (sessionLastActivity[b.key] ?? 0) - (sessionLastActivity[a.key] ?? 0)
   )) {
     const bucketKey = getSessionBucket(sessionLastActivity[session.key] ?? 0, nowMs);
@@ -232,9 +239,11 @@ export function Sidebar() {
 
   return (
     <aside
+      id="sidebar-nav"
       data-testid="sidebar"
+      tabIndex={-1}
       className={cn(
-        'flex min-h-0 shrink-0 flex-col overflow-hidden border-r bg-[#eae8e1]/60 dark:bg-background transition-all duration-300',
+        'flex min-h-0 shrink-0 flex-col overflow-hidden border-r bg-[#eae8e1]/60 dark:bg-background transition-all duration-300 focus:outline-none',
         sidebarCollapsed ? 'w-16' : 'w-64'
       )}
     >
@@ -253,8 +262,9 @@ export function Sidebar() {
           size="icon"
           className="h-8 w-8 shrink-0 text-muted-foreground hover:bg-black/5 dark:hover:bg-white/10"
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={sidebarCollapsed ? t('common:a11y.sidebar.expand') : t('common:a11y.sidebar.collapse')}
           aria-expanded={!sidebarCollapsed}
+          aria-controls="sidebar-nav"
         >
           {sidebarCollapsed ? (
             <PanelLeft className="h-[18px] w-[18px]" aria-hidden="true" />
@@ -265,7 +275,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-col px-2 gap-0.5">
+      <nav aria-label={t('common:a11y.sidebar.nav')} className="flex flex-col px-2 gap-0.5">
         <button
           data-testid="sidebar-new-chat"
           onClick={() => {
@@ -295,60 +305,71 @@ export function Sidebar() {
       </nav>
 
       {/* Session list — below Settings, only when expanded */}
-      {!sidebarCollapsed && sessions.length > 0 && (
-        <div className="mt-4 flex-1 overflow-y-auto overflow-x-hidden px-2 pb-2 space-y-0.5">
+      {!sidebarCollapsed && visibleSessions.length > 0 && (
+        <nav
+          aria-label={t('common:a11y.sidebar.sessions')}
+          className="mt-4 flex-1 overflow-y-auto overflow-x-hidden px-2 pb-2 space-y-0.5"
+        >
           {sessionBuckets.map((bucket) => (
             bucket.sessions.length > 0 ? (
-              <div key={bucket.key} className="pt-2">
-                <div className="px-2.5 pb-1 text-[11px] font-medium text-muted-foreground/60 tracking-tight">
+              <section key={bucket.key} className="pt-2">
+                <h2
+                  id={`sidebar-bucket-${bucket.key}`}
+                  className="px-2.5 pb-1 text-[11px] font-medium text-muted-foreground/60 tracking-tight"
+                >
                   {bucket.label}
-                </div>
-                {bucket.sessions.map((s) => {
-                  const agentId = getAgentIdFromSessionKey(s.key);
-                  const agentName = agentNameById[agentId] || agentId;
-                  return (
-                    <div key={s.key} className="group relative flex items-center">
-                      <button
-                        onClick={() => { switchSession(s.key); navigate('/'); }}
-                        className={cn(
-                          'w-full text-left rounded-lg px-2.5 py-1.5 text-[13px] transition-colors pr-7',
-                          'hover:bg-black/5 dark:hover:bg-white/5',
-                          isOnChat && currentSessionKey === s.key
-                            ? 'bg-black/5 dark:bg-white/10 text-foreground font-medium'
-                            : 'text-foreground/75',
-                        )}
-                      >
-                        <div className="flex min-w-0 items-center gap-2">
-                          <span className="shrink-0 rounded-full bg-black/[0.04] px-2 py-0.5 text-[10px] font-medium text-foreground/70 dark:bg-white/[0.08]">
-                            {agentName}
-                          </span>
-                          <span className="truncate">{getSessionLabel(s.key, s.displayName, s.label)}</span>
-                        </div>
-                      </button>
-                      <button
-                        aria-label="Delete session"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSessionToDelete({
-                            key: s.key,
-                            label: getSessionLabel(s.key, s.displayName, s.label),
-                          });
-                        }}
-                        className={cn(
-                          'absolute right-1 flex items-center justify-center rounded p-0.5 transition-opacity',
-                          'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100',
-                          'text-muted-foreground hover:text-destructive hover:bg-destructive/10',
-                        )}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
+                </h2>
+                <ul aria-labelledby={`sidebar-bucket-${bucket.key}`} className="space-y-0.5">
+                  {bucket.sessions.map((s) => {
+                    const agentId = getAgentIdFromSessionKey(s.key);
+                    const agentName = agentNameById[agentId] || agentId;
+                    const sessionLabel = getSessionLabel(s.key, s.displayName, s.label);
+                    const isActive = isOnChat && currentSessionKey === s.key;
+                    return (
+                      <li key={s.key} className="group relative flex items-center">
+                        <button
+                          onClick={() => { switchSession(s.key); navigate('/'); }}
+                          aria-current={isActive ? 'page' : undefined}
+                          className={cn(
+                            'w-full text-left rounded-lg px-2.5 py-1.5 text-[13px] transition-colors pr-7',
+                            'hover:bg-black/5 dark:hover:bg-white/5',
+                            isActive
+                              ? 'bg-black/5 dark:bg-white/10 text-foreground font-medium'
+                              : 'text-foreground/75',
+                          )}
+                        >
+                          <div className="flex min-w-0 items-center gap-2">
+                            <span className="shrink-0 rounded-full bg-black/[0.04] px-2 py-0.5 text-[10px] font-medium text-foreground/70 dark:bg-white/[0.08]">
+                              {agentName}
+                            </span>
+                            <span className="truncate">{sessionLabel}</span>
+                          </div>
+                        </button>
+                        <button
+                          aria-label={t('common:a11y.sidebar.deleteSession', { label: sessionLabel })}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSessionToDelete({
+                              key: s.key,
+                              label: sessionLabel,
+                            });
+                          }}
+                          className={cn(
+                            'absolute right-1 flex items-center justify-center rounded p-0.5 transition-opacity',
+                            'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100',
+                            'text-muted-foreground hover:text-destructive hover:bg-destructive/10',
+                          )}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
             ) : null
           ))}
-        </div>
+        </nav>
       )}
 
       {/* Footer */}

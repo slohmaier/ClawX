@@ -36,6 +36,10 @@ const CardTitle = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
+  // Heading content is provided by the caller via props.children spread; lint
+  // cannot see that statically, so suppress the heading-has-content rule for
+  // this generic wrapper. Callers are responsible for passing children.
+  // eslint-disable-next-line jsx-a11y/heading-has-content
   <h3
     ref={ref}
     className={cn(

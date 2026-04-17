@@ -1,0 +1,163 @@
+{
+    "steps": {
+        "welcome": {
+            "title": "Willkommen bei ClawX",
+            "description": "Dein KI-Assistent ist bereit zur Konfiguration"
+        },
+        "runtime": {
+            "title": "Umgebungsprüfung",
+            "description": "Systemanforderungen werden geprüft"
+        },
+        "provider": {
+            "title": "KI-Anbieter",
+            "description": "Deinen KI-Dienst einrichten"
+        },
+        "channel": {
+            "title": "Kanal verbinden",
+            "description": "Messaging-Plattform verbinden (optional)"
+        },
+        "installing": {
+            "title": "Einrichtung läuft",
+            "description": "Essenzielle Komponenten werden installiert"
+        },
+        "complete": {
+            "title": "Fertig!",
+            "description": "ClawX ist einsatzbereit"
+        }
+    },
+    "welcome": {
+        "title": "Willkommen bei ClawX",
+        "description": "ClawX ist eine grafische Oberfläche für OpenClaw und macht es einfach, KI-Assistenten auf deinen bevorzugten Messaging-Plattformen zu nutzen.",
+        "features": {
+            "noCommand": "Keine Kommandozeile nötig",
+            "modernUI": "Moderne, schöne Oberfläche",
+            "bundles": "Vorinstallierte Skill-Bundles",
+            "crossPlatform": "Plattformübergreifend"
+        }
+    },
+    "runtime": {
+        "title": "Umgebung wird geprüft",
+        "viewLogs": "Logs ansehen",
+        "recheck": "Erneut prüfen",
+        "nodejs": "Node.js-Laufzeit",
+        "openclaw": "OpenClaw-Paket",
+        "gateway": "Gateway-Dienst",
+        "startGateway": "Gateway starten",
+        "status": {
+            "checking": "Wird geprüft …",
+            "success": "Node.js ist verfügbar",
+            "error": "Fehlgeschlagen",
+            "gatewayRunning": "Läuft auf Port {{port}}",
+            "packageReady": "OpenClaw-Paket bereit"
+        },
+        "issue": {
+            "title": "Problem mit der Umgebung erkannt",
+            "desc": "Bitte stelle sicher, dass OpenClaw korrekt installiert ist. Details siehe Logs."
+        },
+        "logs": {
+            "title": "Anwendungs-Logs",
+            "openFolder": "Log-Ordner öffnen",
+            "close": "Schließen",
+            "noLogs": "(Noch keine Logs verfügbar)"
+        }
+    },
+    "provider": {
+        "label": "Modell-Anbieter",
+        "selectPlaceholder": "Anbieter auswählen …",
+        "baseUrl": "Basis-URL",
+        "modelId": "Modell-ID",
+        "modelIdDesc": "Die Modell-Kennung deines Anbieters (z. B. deepseek-ai/DeepSeek-V3)",
+        "codePlanPreset": "Code-Plan-Voreinstellung",
+        "codePlanMode": "Code-Plan",
+        "useCodePlanPreset": "Ark-Code-Plan-Voreinstellung verwenden",
+        "codePlanPresetDesc": "Code Plan verwendet https://ark.cn-beijing.volces.com/api/coding/v3 und das Modell ark-code-latest. Nutze /api/v3 nicht für Code-Plan-Verkehr.",
+        "codePlanDoc": "Code-Plan-Dokumentation",
+        "protocol": "Protokoll",
+        "protocols": {
+            "openaiCompletions": "OpenAI Completions",
+            "openaiResponses": "OpenAI Responses",
+            "anthropic": "Anthropic-kompatibel"
+        },
+        "apiKey": "API-Schlüssel",
+        "save": "Speichern",
+        "validateSave": "Prüfen & Speichern",
+        "valid": "Anbieter erfolgreich eingerichtet",
+        "invalid": "Ungültiger API-Schlüssel",
+        "storedLocally": "Dein API-Schlüssel wird lokal auf deinem Gerät gespeichert."
+    },
+    "channel": {
+        "title": "Messaging-Kanal verbinden",
+        "subtitle": "Wähle eine Plattform, um deinen KI-Assistenten anzubinden. Weitere Kanäle lassen sich später in den Einstellungen hinzufügen.",
+        "configure": "{{name}} konfigurieren",
+        "howTo": "So verbindest du:",
+        "viewDocs": "Dokumentation anzeigen",
+        "validationError": "Prüfung fehlgeschlagen",
+        "connected": "{{name}} verbunden",
+        "connectedDesc": "Dein Kanal ist konfiguriert. Die Verbindung wird beim Start des Gateways hergestellt.",
+        "configureAnother": "Weiteren Kanal konfigurieren"
+    },
+    "installing": {
+        "title": "Essenzielle Komponenten installieren",
+        "subtitle": "Die nötigen Werkzeuge für deinen KI-Assistenten werden eingerichtet",
+        "progress": "Fortschritt",
+        "status": {
+            "pending": "Ausstehend",
+            "installing": "Wird installiert …",
+            "installed": "Installiert",
+            "failed": "Fehlgeschlagen"
+        },
+        "error": "Einrichtungsfehler:",
+        "restart": "Versuche, die App neu zu starten",
+        "wait": "Das dauert einen Moment …",
+        "skip": "Diesen Schritt überspringen"
+    },
+    "complete": {
+        "title": "Einrichtung abgeschlossen!",
+        "subtitle": "ClawX ist konfiguriert und einsatzbereit. Du kannst jetzt mit deinem KI-Assistenten chatten.",
+        "provider": "KI-Anbieter",
+        "components": "Komponenten",
+        "gateway": "Gateway",
+        "running": "Läuft",
+        "footer": "Skills und Kanäle lassen sich in den Einstellungen anpassen"
+    },
+    "nav": {
+        "next": "Weiter",
+        "back": "Zurück",
+        "skipStep": "Diesen Schritt überspringen",
+        "skipSetup": "Einrichtung überspringen",
+        "getStarted": "Los geht's"
+    },
+    "defaultSkills": {
+        "opencode": {
+            "name": "OpenCode",
+            "description": "Backend für den KI-Coding-Assistenten"
+        },
+        "python-env": {
+            "name": "Python-Umgebung",
+            "description": "Python-Laufzeit für Skills"
+        },
+        "code-assist": {
+            "name": "Code-Assistenz",
+            "description": "Code-Analyse und Vorschläge"
+        },
+        "file-tools": {
+            "name": "Datei-Tools",
+            "description": "Dateioperationen und -verwaltung"
+        },
+        "terminal": {
+            "name": "Terminal",
+            "description": "Shell-Befehle ausführen"
+        }
+    },
+    "a11y": {
+        "progress": "Einrichtungsfortschritt",
+        "progressText": "Schritt {{current}} von {{total}}: {{title}}",
+        "stepChange": "Schritt {{current}} von {{total}}: {{title}}",
+        "stepLabel": "Schritt {{index}} von {{total}}, {{title}}, {{state}}",
+        "stepState": {
+            "completed": "abgeschlossen",
+            "current": "aktuell",
+            "upcoming": "ausstehend"
+        }
+    }
+}

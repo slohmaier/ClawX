@@ -6,7 +6,7 @@
  * Files are staged to disk via IPC — only lightweight path references
  * are sent with the message (no base64 over WebSocket).
  */
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo, useId } from 'react';
 import { SendHorizontal, Square, X, Paperclip, FileText, Film, Music, FileArchive, File, Loader2, AtSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -86,12 +86,15 @@ function readFileAsBase64(file: globalThis.File): Promise<string> {
 
 export function ChatInput({ onSend, onStop, disabled = false, sending = false, isEmpty = false }: ChatInputProps) {
   const { t } = useTranslation('chat');
+  const hintId = useId();
   const [input, setInput] = useState('');
   const [attachments, setAttachments] = useState<FileAttachment[]>([]);
   const [targetAgentId, setTargetAgentId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
+  const menuItemsRef = useRef<Array<HTMLButtonElement | null>>([]);
+  const [activeMenuIndex, setActiveMenuIndex] = useState<number>(0);
   const isComposingRef = useRef(false);
   const gatewayStatus = useGatewayStore((s) => s.status);
   const agents = useAgentsStore((s) => s.agents);
@@ -150,6 +153,30 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
       document.removeEventListener('mousedown', handlePointerDown);
     };
   }, [pickerOpen]);
+
+  // Roving-tabindex focus management for the agent mention picker.
+  // When the menu opens, we land focus on the currently-selected row (or the
+  // first one). Arrow keys then move the `activeMenuIndex`, and an effect
+  // imperatively focuses the matching <button>. Non-active items keep
+  // `tabIndex={-1}` so only one item is in the tab order at a time.
+  useEffect(() => {
+    if (!pickerOpen) return;
+    const initialIndex = Math.max(
+      0,
+      mentionableAgents.findIndex((a) => a.id === targetAgentId),
+    );
+    setActiveMenuIndex(initialIndex);
+    // Defer focus to the next tick so the menu has mounted.
+    const id = window.requestAnimationFrame(() => {
+      menuItemsRef.current[initialIndex]?.focus();
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [pickerOpen, mentionableAgents, targetAgentId]);
+
+  useEffect(() => {
+    if (!pickerOpen) return;
+    menuItemsRef.current[activeMenuIndex]?.focus();
+  }, [activeMenuIndex, pickerOpen]);
 
   // ── File staging via native dialog ─────────────────────────────
 
@@ -396,15 +423,19 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
       <div className="w-full">
         {/* Attachment Previews */}
         {attachments.length > 0 && (
-          <div className="flex gap-2 mb-3 flex-wrap">
+          <ul
+            aria-label={t('composer.a11y.attachments')}
+            className="flex gap-2 mb-3 flex-wrap"
+          >
             {attachments.map((att) => (
-              <AttachmentPreview
-                key={att.id}
-                attachment={att}
-                onRemove={() => removeAttachment(att.id)}
-              />
+              <li key={att.id} className="contents">
+                <AttachmentPreview
+                  attachment={att}
+                  onRemove={() => removeAttachment(att.id)}
+                />
+              </li>
             ))}
-          </div>
+          </ul>
         )}
 
         {/* Input Row */}
@@ -443,9 +474,40 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
                 ref={pickerRef}
                 className="relative shrink-0"
                 onKeyDown={(e) => {
-                  if (e.key === 'Escape' && pickerOpen) {
+                  if (!pickerOpen) return;
+                  if (e.key === 'Escape') {
                     e.preventDefault();
                     setPickerOpen(false);
+                    textareaRef.current?.focus();
+                    return;
+                  }
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setActiveMenuIndex((i) =>
+                      mentionableAgents.length === 0
+                        ? 0
+                        : (i + 1) % mentionableAgents.length,
+                    );
+                    return;
+                  }
+                  if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setActiveMenuIndex((i) =>
+                      mentionableAgents.length === 0
+                        ? 0
+                        : (i - 1 + mentionableAgents.length) % mentionableAgents.length,
+                    );
+                    return;
+                  }
+                  if (e.key === 'Home') {
+                    e.preventDefault();
+                    setActiveMenuIndex(0);
+                    return;
+                  }
+                  if (e.key === 'End') {
+                    e.preventDefault();
+                    setActiveMenuIndex(Math.max(0, mentionableAgents.length - 1));
+                    return;
                   }
                 }}
               >
@@ -475,16 +537,19 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
                       {t('composer.agentPickerTitle', { currentAgent: currentAgentName })}
                     </div>
                     <div className="max-h-64 overflow-y-auto">
-                      {mentionableAgents.map((agent) => (
+                      {mentionableAgents.map((agent, i) => (
                         <AgentPickerItem
                           key={agent.id}
+                          ref={(el) => { menuItemsRef.current[i] = el; }}
                           agent={agent}
                           selected={agent.id === targetAgentId}
+                          active={i === activeMenuIndex}
                           onSelect={() => {
                             setTargetAgentId(agent.id);
                             setPickerOpen(false);
                             textareaRef.current?.focus();
                           }}
+                          onFocus={() => setActiveMenuIndex(i)}
                         />
                       ))}
                     </div>
@@ -509,9 +574,16 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
                 onPaste={handlePaste}
                 placeholder={disabled ? t('composer.gatewayDisconnectedPlaceholder') : ''}
                 disabled={disabled}
+                aria-label={t('composer.a11y.inputLabel')}
+                aria-describedby={hintId}
                 className="min-h-[40px] max-h-[200px] resize-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none bg-transparent py-2.5 px-2 text-[15px] placeholder:text-muted-foreground/60 leading-relaxed"
                 rows={1}
               />
+              {/* Keyboard hint — sr-only because the muted gateway status bar
+                  below already gives sighted users a visual affordance. */}
+              <span id={hintId} className="sr-only">
+                {t('composer.a11y.inputHint')}
+              </span>
             </div>
 
             {/* Send Button */}
@@ -580,6 +652,7 @@ function AttachmentPreview({
   attachment: FileAttachment;
   onRemove: () => void;
 }) {
+  const { t } = useTranslation('chat');
   const isImage = attachment.mimeType.startsWith('image/') && attachment.preview;
 
   return (
@@ -624,7 +697,7 @@ function AttachmentPreview({
       <button
         onClick={onRemove}
         className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 transition-opacity"
-        aria-label={`Remove attachment ${attachment.fileName}`}
+        aria-label={t('composer.a11y.removeAttachment', { name: attachment.fileName })}
       >
         <X className="h-3 w-3" aria-hidden="true" />
       </button>
@@ -632,30 +705,38 @@ function AttachmentPreview({
   );
 }
 
-function AgentPickerItem({
-  agent,
-  selected,
-  onSelect,
-}: {
+interface AgentPickerItemProps {
   agent: AgentSummary;
   selected: boolean;
+  active: boolean;
   onSelect: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      role="menuitem"
-      aria-current={selected ? 'true' : undefined}
-      className={cn(
-        'flex w-full flex-col items-start rounded-xl px-3 py-2 text-left transition-colors',
-        selected ? 'bg-primary/10 text-foreground' : 'hover:bg-black/5 dark:hover:bg-white/5'
-      )}
-    >
-      <span className="text-[14px] font-medium text-foreground">{agent.name}</span>
-      <span className="text-[11px] text-muted-foreground">
-        {agent.modelDisplay}
-      </span>
-    </button>
-  );
+  onFocus: () => void;
 }
+
+const AgentPickerItem = React.forwardRef<HTMLButtonElement, AgentPickerItemProps>(
+  function AgentPickerItem({ agent, selected, active, onSelect, onFocus }, ref) {
+    return (
+      <button
+        ref={ref}
+        type="button"
+        onClick={onSelect}
+        onFocus={onFocus}
+        role="menuitem"
+        // Roving-tabindex: only the active item joins the tab order.
+        // `aria-current="true"` marks the user's persisted choice; focus state
+        // is independent and driven by ArrowUp/Down.
+        tabIndex={active ? 0 : -1}
+        aria-current={selected ? 'true' : undefined}
+        className={cn(
+          'flex w-full flex-col items-start rounded-xl px-3 py-2 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
+          selected ? 'bg-primary/10 text-foreground' : 'hover:bg-black/5 dark:hover:bg-white/5',
+        )}
+      >
+        <span className="text-[14px] font-medium text-foreground">{agent.name}</span>
+        <span className="text-[11px] text-muted-foreground">
+          {agent.modelDisplay}
+        </span>
+      </button>
+    );
+  },
+);

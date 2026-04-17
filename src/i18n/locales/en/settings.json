@@ -48,6 +48,8 @@
       "apiKeyConfigured": "An API key is already stored for this provider.",
       "apiKeyMissing": "No API key is stored for this provider yet.",
       "apiKeyStored": "Your API key is stored locally on your machine.",
+      "showKey": "Show API key",
+      "hideKey": "Hide API key",
       "replaceApiKey": "Replace API Key",
       "replaceApiKeyHelp": "Leave this field empty if you want to keep the currently stored API key.",
       "baseUrl": "Base URL",

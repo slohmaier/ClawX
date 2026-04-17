@@ -6,6 +6,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Component, useEffect } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
 import { Toaster } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import i18n from './i18n';
 import { MainLayout } from './components/layout/MainLayout';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -23,6 +24,10 @@ import { useProviderStore } from './stores/providers';
 import { applyGatewayTransportPreference } from './lib/api-client';
 import { rendererExtensionRegistry } from './extensions/registry';
 import { loadExternalRendererExtensions } from './extensions/_ext-bridge.generated';
+import { useRouteAnnouncer } from './hooks/useRouteAnnouncer';
+import { useGlobalShortcuts } from './hooks/useGlobalShortcuts';
+import { useAppAnnouncements } from './hooks/useAppAnnouncements';
+import { ShortcutsDialog } from './components/common/ShortcutsDialog';
 
 
 /**
@@ -100,6 +105,20 @@ function App() {
   const setupComplete = useSettingsStore((state) => state.setupComplete);
   const initGateway = useGatewayStore((state) => state.init);
   const initProviders = useProviderStore((state) => state.init);
+  const { t } = useTranslation('common');
+
+  // Announce route transitions to screen readers and refocus main content.
+  // Mounted at the App root so it observes every route change, not just those
+  // inside MainLayout (setup wizard transitions still get announced).
+  useRouteAnnouncer();
+
+  // App-wide keyboard shortcuts (sidebar toggle, settings, future help dialog).
+  // Page-scoped shortcuts live in their component.
+  useGlobalShortcuts();
+
+  // Narrate gateway connection changes, streaming completion and tool errors
+  // to screen readers. Heartbeat/subagent state is intentionally not announced.
+  useAppAnnouncements();
 
   useEffect(() => {
     initSettings();
@@ -198,11 +217,18 @@ function App() {
           </Route>
         </Routes>
 
-        {/* Global toast notifications */}
+        {/* Global keyboard-shortcut reference dialog (opens on Cmd+/). */}
+        <ShortcutsDialog />
+
+        {/* Global toast notifications. Sonner already sets role=status for
+            polite messages and role=alert for errors; we only localise the
+            region and close-button labels. */}
         <Toaster
           position="bottom-right"
           richColors
           closeButton
+          containerAriaLabel={t('a11y.toasts.region')}
+          toastOptions={{ closeButtonAriaLabel: t('a11y.toasts.dismiss') }}
           style={{ zIndex: 99999 }}
         />
       </TooltipProvider>

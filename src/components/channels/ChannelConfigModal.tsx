@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import {
   X,
   Loader2,
@@ -490,43 +491,56 @@ export function ChannelConfigModal({
     setShowSecrets((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const titleText = selectedType
+    ? isExistingConfig
+      ? t('dialog.updateTitle', { name: CHANNEL_NAMES[selectedType] })
+      : t('dialog.configureTitle', { name: CHANNEL_NAMES[selectedType] })
+    : t('dialog.addTitle');
+  const descriptionText = selectedType && isExistingConfig
+    ? t('dialog.existingDesc')
+    : meta ? t(meta.description.replace('channels:', '')) : t('dialog.selectDesc');
+
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) {
-          onClose();
-        }
+    <DialogPrimitive.Root
+      open
+      onOpenChange={(next) => {
+        if (!next) onClose();
       }}
     >
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <DialogPrimitive.Content
+          className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-2rem)] max-w-3xl max-h-[90vh] focus:outline-none"
+        >
       <Card
-        className="w-full max-w-3xl max-h-[90vh] flex flex-col rounded-3xl border-0 shadow-2xl bg-[#f3f1e9] dark:bg-card overflow-hidden"
-        onMouseDown={(event) => event.stopPropagation()}
-        onClick={(event) => event.stopPropagation()}
+        className="w-full max-h-[90vh] flex flex-col rounded-3xl border-0 shadow-2xl bg-[#f3f1e9] dark:bg-card overflow-hidden"
       >
         <CardHeader className="flex flex-row items-start justify-between pb-2 shrink-0">
           <div>
-            <CardTitle className="text-2xl font-serif font-normal tracking-tight">
-              {selectedType
-                ? isExistingConfig
-                  ? t('dialog.updateTitle', { name: CHANNEL_NAMES[selectedType] })
-                  : t('dialog.configureTitle', { name: CHANNEL_NAMES[selectedType] })
-                : t('dialog.addTitle')}
-            </CardTitle>
-            <CardDescription className="text-[15px] mt-1 text-foreground/70">
-              {selectedType && isExistingConfig
-                ? t('dialog.existingDesc')
-                : meta ? t(meta.description.replace('channels:', '')) : t('dialog.selectDesc')}
-            </CardDescription>
+            {/* Merge Radix DialogTitle into the visible CardTitle so the
+                dialog gets its required accessible name without rendering
+                the string twice in the DOM (which broke text-based queries). */}
+            <DialogPrimitive.Title asChild>
+              <CardTitle className="text-2xl font-serif font-normal tracking-tight">
+                {titleText}
+              </CardTitle>
+            </DialogPrimitive.Title>
+            <DialogPrimitive.Description asChild>
+              <CardDescription className="text-[15px] mt-1 text-foreground/70">
+                {descriptionText}
+              </CardDescription>
+            </DialogPrimitive.Description>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="rounded-full h-8 w-8 -mr-2 -mt-2 text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          <DialogPrimitive.Close asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={t('dialog.close')}
+              className="rounded-full h-8 w-8 -mr-2 -mt-2 text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          </DialogPrimitive.Close>
         </CardHeader>
         <CardContent className="space-y-6 pt-4 overflow-y-auto flex-1 p-6">
           {!selectedType ? (
@@ -791,7 +805,9 @@ export function ChannelConfigModal({
           )}
         </CardContent>
       </Card>
-    </div>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 }
 

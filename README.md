@@ -134,6 +134,9 @@ Light mode, dark mode, or system-synchronized themes. ClawX adapts to your prefe
 ### 🚀 Startup Launch Control
 In **Settings → General**, you can enable **Launch at system startup** so ClawX starts automatically after login.
 
+### ♿ Accessibility
+ClawX is being built to WCAG 2.1 AA with first-class support for screen readers (VoiceOver, NVDA, JAWS, Orca) and keyboard-only use. Automated lint (`eslint-plugin-jsx-a11y`) and axe-based unit + end-to-end tests gate every PR. See [`ACCESSIBILITY.md`](ACCESSIBILITY.md) for the current status matrix and [`docs/keyboard-shortcuts.md`](docs/keyboard-shortcuts.md) for the full keyboard reference.
+
 ---
 
 ## Getting Started

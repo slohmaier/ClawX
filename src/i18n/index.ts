@@ -17,6 +17,17 @@ import enSkills from './locales/en/skills.json';
 import enCron from './locales/en/cron.json';
 import enSetup from './locales/en/setup.json';
 
+// DE
+import deCommon from './locales/de/common.json';
+import deSettings from './locales/de/settings.json';
+import deDashboard from './locales/de/dashboard.json';
+import deChat from './locales/de/chat.json';
+import deChannels from './locales/de/channels.json';
+import deAgents from './locales/de/agents.json';
+import deSkills from './locales/de/skills.json';
+import deCron from './locales/de/cron.json';
+import deSetup from './locales/de/setup.json';
+
 // ZH
 import zhCommon from './locales/zh/common.json';
 import zhSettings from './locales/zh/settings.json';
@@ -52,6 +63,7 @@ import ruSetup from './locales/ru/setup.json';
 
 export const SUPPORTED_LANGUAGES = [
     { code: 'en', label: 'English' },
+    { code: 'de', label: 'Deutsch' },
     { code: 'zh', label: '中文' },
     { code: 'ja', label: '日本語' },
     { code: 'ru', label: 'Русский' },
@@ -68,6 +80,17 @@ const resources = {
         skills: enSkills,
         cron: enCron,
         setup: enSetup,
+    },
+    de: {
+        common: deCommon,
+        settings: deSettings,
+        dashboard: deDashboard,
+        chat: deChat,
+        channels: deChannels,
+        agents: deAgents,
+        skills: deSkills,
+        cron: deCron,
+        setup: deSetup,
     },
     zh: {
         common: zhCommon,

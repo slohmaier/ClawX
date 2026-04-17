@@ -22,6 +22,8 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip
 import { cn } from '@/lib/utils';
 import { useGatewayStore } from '@/stores/gateway';
 import { useSettingsStore } from '@/stores/settings';
+import { useAnnounce } from '@/hooks/useAnnounce';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { SUPPORTED_LANGUAGES } from '@/i18n';
@@ -88,6 +90,8 @@ import clawxIcon from '@/assets/logo.svg';
 export function Setup() {
   const { t } = useTranslation(['setup', 'channels']);
   const navigate = useNavigate();
+  const announce = useAnnounce();
+  const reduceMotion = useReducedMotion();
   const [currentStep, setCurrentStep] = useState<number>(STEP.WELCOME);
 
   // Setup state
@@ -96,7 +100,7 @@ export function Setup() {
   // Runtime check status
   const [runtimeChecksPassed, setRuntimeChecksPassed] = useState(false);
 
-  const steps = getSteps(t);
+  const steps = useMemo(() => getSteps(t), [t]);
   const safeStepIndex = Number.isInteger(currentStep)
     ? Math.min(Math.max(currentStep, STEP.WELCOME), steps.length - 1)
     : STEP.WELCOME;
@@ -105,6 +109,20 @@ export function Setup() {
   const isLastStep = safeStepIndex === steps.length - 1;
 
   const markSetupComplete = useSettingsStore((state) => state.markSetupComplete);
+
+  // Announce step transitions via the global live region so SR users hear
+  // "Step 2 of 4: Runtime setup" when the wizard advances.
+  useEffect(() => {
+    announce(
+      t('a11y.stepChange', {
+        current: safeStepIndex + 1,
+        total: steps.length,
+        title: step.title,
+      }),
+      'polite',
+    );
+    // `step.title` changes when the locale changes — that's intentional.
+  }, [safeStepIndex, step.title, steps.length, announce, t]);
 
   // Derive canProceed based on current step - computed directly to avoid useEffect
   const canProceed = useMemo(() => {
@@ -156,37 +174,70 @@ export function Setup() {
     <div data-testid="setup-page" className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
       <TitleBar />
       <div className="flex-1 overflow-auto">
-        {/* Progress Indicator */}
+        {/* Progress Indicator — semantic <ol> stepper + a progressbar for
+            screen readers so both outline and percent-complete are exposed. */}
         <div className="flex justify-center pt-8">
-          <div className="flex items-center gap-2">
-            {steps.map((s, i) => (
-              <div key={s.id} className="flex items-center">
-                <div
-                  className={cn(
-                    'flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors',
-                    i < safeStepIndex
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : i === safeStepIndex
-                        ? 'border-primary text-primary'
-                        : 'border-slate-600 text-slate-600'
-                  )}
-                >
-                  {i < safeStepIndex ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <span className="text-sm">{i + 1}</span>
-                  )}
-                </div>
-                {i < steps.length - 1 && (
-                  <div
-                    className={cn(
-                      'h-0.5 w-8 transition-colors',
-                      i < safeStepIndex ? 'bg-primary' : 'bg-slate-600'
+          <div
+            role="progressbar"
+            aria-label={t('a11y.progress')}
+            aria-valuemin={1}
+            aria-valuemax={steps.length}
+            aria-valuenow={safeStepIndex + 1}
+            aria-valuetext={t('a11y.progressText', {
+              current: safeStepIndex + 1,
+              total: steps.length,
+              title: step.title,
+            })}
+          >
+            <ol className="flex items-center gap-2">
+              {steps.map((s, i) => {
+                const completed = i < safeStepIndex;
+                const active = i === safeStepIndex;
+                return (
+                  <li
+                    key={s.id}
+                    className="flex items-center"
+                    aria-current={active ? 'step' : undefined}
+                  >
+                    <span
+                      className={cn(
+                        'flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors',
+                        completed
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : active
+                            ? 'border-primary text-primary'
+                            : 'border-slate-600 text-slate-600'
+                      )}
+                      aria-label={t('a11y.stepLabel', {
+                        index: i + 1,
+                        total: steps.length,
+                        title: s.title,
+                        state: completed
+                          ? t('a11y.stepState.completed')
+                          : active
+                            ? t('a11y.stepState.current')
+                            : t('a11y.stepState.upcoming'),
+                      })}
+                    >
+                      {completed ? (
+                        <Check className="h-4 w-4" aria-hidden="true" />
+                      ) : (
+                        <span className="text-sm" aria-hidden="true">{i + 1}</span>
+                      )}
+                    </span>
+                    {i < steps.length - 1 && (
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          'h-0.5 w-8 transition-colors',
+                          completed ? 'bg-primary' : 'bg-slate-600'
+                        )}
+                      />
                     )}
-                  />
-                )}
-              </div>
-            ))}
+                  </li>
+                );
+              })}
+            </ol>
           </div>
         </div>
 
@@ -194,9 +245,10 @@ export function Setup() {
         <AnimatePresence mode="wait">
           <motion.div
             key={step.id}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 20 }}
+            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -20 }}
+            transition={{ duration: reduceMotion ? 0 : 0.25 }}
             className="mx-auto max-w-2xl p-8"
           >
             <div className="text-center mb-8">

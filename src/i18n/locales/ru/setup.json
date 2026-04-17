@@ -148,5 +148,16 @@
             "name": "Терминал",
             "description": "Выполнение shell-команд"
         }
+    },
+    "a11y": {
+        "progress": "Прогресс настройки",
+        "progressText": "Шаг {{current}} из {{total}}: {{title}}",
+        "stepChange": "Шаг {{current}} из {{total}}: {{title}}",
+        "stepLabel": "Шаг {{index}} из {{total}}, {{title}}, {{state}}",
+        "stepState": {
+            "completed": "завершён",
+            "current": "текущий",
+            "upcoming": "предстоящий"
+        }
     }
 }

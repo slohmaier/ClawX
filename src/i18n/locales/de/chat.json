@@ -1,0 +1,103 @@
+{
+    "gatewayNotRunning": "Gateway läuft nicht",
+    "gatewayRequired": "Das OpenClaw-Gateway muss laufen, um den Chat zu nutzen. Es startet automatisch oder du kannst es in den Einstellungen starten.",
+    "welcome": {
+        "title": "ClawX-Chat",
+        "subtitle": "Was kann ich für dich tun?",
+        "askQuestions": "Aufgaben erledigen",
+        "askQuestionsDesc": "Aufgabenbezogene Anfragen bearbeiten",
+        "creativeTasks": "Durchgehende Ausführung",
+        "creativeTasksDesc": "Mehrstufige Arbeiten ohne Unterbrechung ausführen",
+        "brainstorming": "Mehrere Agenten parallel"
+    },
+    "noLogs": "(Noch keine Logs verfügbar)",
+    "toolbar": {
+        "refresh": "Chat neu laden",
+        "showThinking": "Gedanken anzeigen",
+        "hideThinking": "Gedanken verbergen",
+        "currentAgent": "Gespräch mit {{agent}}"
+    },
+    "taskPanel": {
+        "eyebrow": "Laufübersicht",
+        "title": "Aufgabenübersicht",
+        "emptyTitle": "Noch keine strukturierten Schritte",
+        "emptyBody": "Sobald ein Durchlauf startet, erscheinen hier Gedanken, Tool-Aufrufe und Übergabezustände.",
+        "status": {
+            "idle": "Inaktiv",
+            "running_one": "1 aktiver Schritt",
+            "running_other": "{{count}} aktive Schritte"
+        },
+        "stepStatus": {
+            "running": "Läuft",
+            "completed": "Fertig",
+            "error": "Fehler"
+        }
+    },
+    "executionGraph": {
+        "eyebrow": "Gesprächsdurchlauf",
+        "title": "Ausführungsgraph",
+        "status": {
+            "active": "Aktiv",
+            "latest": "Neueste",
+            "previous": "Vorherige"
+        },
+        "branchLabel": "Zweig",
+        "userTrigger": "Auslöser Nutzer",
+        "userTriggerHint": "Ausgelöst durch die obige Benutzernachricht",
+        "agentRun": "Ausführung von {{agent}}",
+        "agentReply": "Antwort des Assistenten",
+        "agentReplyHint": "In der Antwort des Assistenten unten aufgelöst"
+    },
+    "composer": {
+        "attachFiles": "Dateien anhängen",
+        "pickAgent": "Agent wählen",
+        "clearTarget": "Zielagent entfernen",
+        "targetChip": "@{{agent}}",
+        "agentPickerTitle": "Nächste Nachricht an einen anderen Agenten senden",
+        "gatewayDisconnectedPlaceholder": "Gateway nicht verbunden …",
+        "send": "Senden",
+        "stop": "Stopp",
+        "gatewayConnected": "verbunden",
+        "gatewayStatus": "Gateway {{state}} | Port: {{port}} {{pid}}",
+        "retryFailedAttachments": "Fehlgeschlagene Anhänge wiederholen",
+        "a11y": {
+            "inputLabel": "Nachricht",
+            "inputHint": "Enter zum Senden, Shift+Enter für eine neue Zeile, @ um einen Agenten zu erwähnen.",
+            "attachments": "Anhänge",
+            "removeAttachment": "Anhang {{name}} entfernen"
+        }
+    },
+    "historyBuckets": {
+        "today": "Heute",
+        "yesterday": "Gestern",
+        "withinWeek": "Innerhalb 1 Woche",
+        "withinTwoWeeks": "Innerhalb 2 Wochen",
+        "withinMonth": "Innerhalb 1 Monat",
+        "older": "Älter als 1 Monat"
+    },
+    "a11y": {
+        "log": "Chat-Nachrichten",
+        "message": {
+            "author": {
+                "user": "Du",
+                "assistant": "Assistent",
+                "system": "System"
+            }
+        },
+        "streaming": {
+            "typing": "Assistent tippt"
+        },
+        "tool": {
+            "running": "Tool läuft:",
+            "success": "Tool abgeschlossen:",
+            "error": "Tool fehlgeschlagen:"
+        },
+        "codeBlock": "Codeblock, {{lang}}",
+        "codeBlockPlain": "Codeblock",
+        "copyCode": "Code in die Zwischenablage kopieren",
+        "attachmentImage": "Bildanhang: {{name}}",
+        "thinking": {
+            "toggle": "Gedankengang anzeigen"
+        }
+    }
+}

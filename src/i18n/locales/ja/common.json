@@ -55,5 +55,86 @@
         "notRunning": "ゲートウェイが停止中",
         "notRunningDesc": "この機能を使用するには OpenClaw ゲートウェイが実行されている必要があります。自動的に起動するか、設定から起動できます。",
         "warning": "ゲートウェイが停止中です。"
+    },
+    "a11y": {
+        "skipToContent": "メインコンテンツへスキップ",
+        "skipToSidebar": "サイドバーへスキップ",
+        "sidebar": {
+            "nav": "メインナビゲーション",
+            "sessions": "チャットセッション",
+            "deleteSession": "セッション「{{label}}」を削除",
+            "collapse": "サイドバーを折りたたむ",
+            "expand": "サイドバーを展開"
+        },
+        "toasts": {
+            "region": "通知",
+            "dismiss": "通知を閉じる"
+        },
+        "connection": {
+            "connected": "ゲートウェイに接続しました",
+            "disconnected": "ゲートウェイから切断されました",
+            "reconnecting": "ゲートウェイに再接続中"
+        },
+        "streaming": {
+            "complete": "アシスタントの応答が完了しました"
+        },
+        "tool": {
+            "errorAnnouncement": "ツール {{name}} が失敗しました"
+        }
+    },
+    "shortcuts": {
+        "dialogTitle": "キーボードショートカット",
+        "dialogDescription": "ClawX で利用可能なすべてのキーボードショートカット。",
+        "close": "ショートカットダイアログを閉じる",
+        "scope": {
+            "global": "グローバル",
+            "chat": "チャット",
+            "sidebar": "サイドバー",
+            "modal": "モーダル"
+        },
+        "help": {
+            "open": {
+                "label": "ショートカットを表示",
+                "description": "キーボードショートカット一覧を開く"
+            }
+        },
+        "command": {
+            "palette": {
+                "label": "コマンドパレット",
+                "description": "コマンド / セッション検索を開く"
+            }
+        },
+        "sidebar": {
+            "toggle": {
+                "label": "サイドバーを切り替え",
+                "description": "サイドバーを表示 / 非表示"
+            }
+        },
+        "settings": {
+            "open": {
+                "label": "設定を開く",
+                "description": "設定ページへ移動"
+            }
+        },
+        "chat": {
+            "new": {
+                "label": "新しいチャット",
+                "description": "新しいチャットセッションを開始"
+            },
+            "send": {
+                "label": "メッセージを送信",
+                "description": "現在のメッセージを送信"
+            },
+            "newline": {
+                "label": "改行を挿入",
+                "description": "送信せずに改行を挿入"
+            }
+        },
+        "modal": {
+            "close": {
+                "label": "モーダルを閉じる",
+                "description": "アクティブなモーダル / ポップオーバーを閉じる"
+            }
+        }
     }
 }

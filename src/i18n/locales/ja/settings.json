@@ -48,6 +48,8 @@
       "apiKeyConfigured": "このプロバイダーには API キーが保存されています。",
       "apiKeyMissing": "このプロバイダーにはまだ API キーが保存されていません。",
       "apiKeyStored": "API キーはローカルマシンに保存されます。",
+      "showKey": "API キーを表示",
+      "hideKey": "API キーを隠す",
       "replaceApiKey": "API キーを置き換える",
       "replaceApiKeyHelp": "現在保存されている API キーをそのまま使う場合は、この欄を空のままにしてください。",
       "baseUrl": "ベース URL",

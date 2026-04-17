@@ -70,6 +70,7 @@
         "accountIdExists": "账号 ID {{accountId}} 已存在"
     },
     "dialog": {
+        "close": "关闭对话框",
         "updateTitle": "更新 {{name}}",
         "configureTitle": "配置 {{name}}",
         "addTitle": "添加频道",

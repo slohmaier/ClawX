@@ -148,5 +148,16 @@
             "name": "ターミナル",
             "description": "シェルコマンドの実行"
         }
+    },
+    "a11y": {
+        "progress": "セットアップの進捗",
+        "progressText": "ステップ {{current}}/{{total}}: {{title}}",
+        "stepChange": "ステップ {{current}}/{{total}}: {{title}}",
+        "stepLabel": "ステップ {{index}}/{{total}}、{{title}}、{{state}}",
+        "stepState": {
+            "completed": "完了",
+            "current": "現在",
+            "upcoming": "未実施"
+        }
     }
 }

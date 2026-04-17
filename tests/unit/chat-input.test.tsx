@@ -135,4 +135,77 @@ describe('ChatInput agent targeting', () => {
 
     expect(onSend).toHaveBeenCalledWith('Hello direct agent', undefined, 'research');
   });
+
+  it('supports arrow-key navigation through the agent picker menu (roving tabindex)', () => {
+    // mentionableAgents excludes the current agent, so we need at least two
+    // non-current agents to exercise arrow-key navigation between them.
+    agentsState.agents = [
+      {
+        id: 'main',
+        name: 'Main',
+        isDefault: true,
+        modelDisplay: 'MiniMax',
+        inheritedModel: true,
+        workspace: '~/.openclaw/workspace',
+        agentDir: '~/.openclaw/agents/main/agent',
+        mainSessionKey: 'agent:main:main',
+        channelTypes: [],
+      },
+      {
+        id: 'research',
+        name: 'Research',
+        isDefault: false,
+        modelDisplay: 'Claude',
+        inheritedModel: false,
+        workspace: '~/.openclaw/workspace-research',
+        agentDir: '~/.openclaw/agents/research/agent',
+        mainSessionKey: 'agent:research:desk',
+        channelTypes: [],
+      },
+      {
+        id: 'ops',
+        name: 'Ops',
+        isDefault: false,
+        modelDisplay: 'Claude',
+        inheritedModel: false,
+        workspace: '~/.openclaw/workspace-ops',
+        agentDir: '~/.openclaw/agents/ops/agent',
+        mainSessionKey: 'agent:ops:desk',
+        channelTypes: [],
+      },
+    ];
+
+    const { container } = render(<ChatInput onSend={vi.fn()} />);
+    fireEvent.click(screen.getByTitle('Choose agent'));
+
+    const menu = screen.getByRole('menu');
+    const items = screen.getAllByRole('menuitem');
+    expect(items).toHaveLength(2);
+
+    // Exactly one item is in the tab order at any time (roving tabindex).
+    const tabbable = items.filter((el) => el.getAttribute('tabindex') === '0');
+    expect(tabbable).toHaveLength(1);
+
+    // ArrowDown moves the roving index to the next item.
+    fireEvent.keyDown(menu, { key: 'ArrowDown' });
+    const tabbableAfter = screen
+      .getAllByRole('menuitem')
+      .filter((el) => el.getAttribute('tabindex') === '0');
+    expect(tabbableAfter).toHaveLength(1);
+    // It should have moved from the first to the second item.
+    expect(tabbableAfter[0]).toBe(items[1]);
+
+    // ArrowUp wraps back to the previous item.
+    fireEvent.keyDown(menu, { key: 'ArrowUp' });
+    const tabbableBack = screen
+      .getAllByRole('menuitem')
+      .filter((el) => el.getAttribute('tabindex') === '0');
+    expect(tabbableBack[0]).toBe(items[0]);
+
+    // Escape closes the menu.
+    fireEvent.keyDown(menu, { key: 'Escape' });
+    expect(screen.queryByRole('menu')).toBeNull();
+    // Silences unused-variable warning on the outer container.
+    expect(container).toBeTruthy();
+  });
 });

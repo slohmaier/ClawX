@@ -70,6 +70,7 @@
         "accountIdExists": "アカウント ID {{accountId}} はすでに存在します"
     },
     "dialog": {
+        "close": "ダイアログを閉じる",
         "updateTitle": "{{name}} を更新",
         "configureTitle": "{{name}} を設定",
         "addTitle": "チャンネルを追加",

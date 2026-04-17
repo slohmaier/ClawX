@@ -1,6 +1,6 @@
 import { invokeIpc } from '@/lib/api-client';
 import { getCanonicalPrefixFromSessions, getMessageText, toMs } from './helpers';
-import { DEFAULT_CANONICAL_PREFIX, DEFAULT_SESSION_KEY, type ChatSession, type RawMessage } from './types';
+import { DEFAULT_CANONICAL_PREFIX, DEFAULT_SESSION_KEY, type ChatSession, type ChatSessionOrigin, type RawMessage } from './types';
 import type { ChatGet, ChatSet, SessionHistoryActions } from './store-api';
 
 const LABEL_FETCH_CONCURRENCY = 5;
@@ -9,6 +9,17 @@ function getAgentIdFromSessionKey(sessionKey: string): string {
   if (!sessionKey.startsWith('agent:')) return 'main';
   const [, agentId] = sessionKey.split(':');
   return agentId || 'main';
+}
+
+function parseSessionOrigin(value: unknown): ChatSessionOrigin | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+  const o = value as Record<string, unknown>;
+  const result: ChatSessionOrigin = {};
+  for (const field of ['provider', 'from', 'to', 'surface', 'label'] as const) {
+    const v = o[field];
+    if (typeof v === 'string' && v.trim()) result[field] = v;
+  }
+  return Object.keys(result).length > 0 ? result : undefined;
 }
 
 function parseSessionUpdatedAtMs(value: unknown): number | undefined {
@@ -47,6 +58,7 @@ export function createSessionActions(
             thinkingLevel: s.thinkingLevel ? String(s.thinkingLevel) : undefined,
             model: s.model ? String(s.model) : undefined,
             updatedAt: parseSessionUpdatedAtMs(s.updatedAt),
+            origin: parseSessionOrigin(s.origin),
           })).filter((s: ChatSession) => s.key);
 
           const canonicalBySuffix = new Map<string, string>();
@@ -131,7 +143,15 @@ export function createSessionActions(
                       ) as { success: boolean; result?: Record<string, unknown>; error?: string };
                       if (!r.success || !r.result) return;
                       const msgs = Array.isArray(r.result.messages) ? r.result.messages as RawMessage[] : [];
-                      const firstUser = msgs.find((m) => m.role === 'user');
+                      // Prefer the first *real* user message. Heartbeat pings
+                      // are written as `user` messages that start with
+                      // "Read HEARTBEAT.md" — pick the next real message so
+                      // the sidebar label reflects the actual conversation.
+                      const firstUser = msgs.find((m) => {
+                        if (m.role !== 'user') return false;
+                        const text = getMessageText(m.content).trim();
+                        return text.length > 0 && !/^Read\s+HEARTBEAT\.md\b/i.test(text);
+                      }) ?? msgs.find((m) => m.role === 'user');
                       const lastMsg = msgs[msgs.length - 1];
                       set((s) => {
                         const next: Partial<typeof s> = {};

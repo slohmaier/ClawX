@@ -59,7 +59,13 @@
         "stop": "Остановить",
         "gatewayConnected": "подключён",
         "gatewayStatus": "шлюз {{state}} | порт: {{port}} {{pid}}",
-        "retryFailedAttachments": "Повторить неудавшиеся вложения"
+        "retryFailedAttachments": "Повторить неудавшиеся вложения",
+        "a11y": {
+            "inputLabel": "Сообщение",
+            "inputHint": "Enter — отправить, Shift+Enter — перенос строки, @ — упомянуть агента.",
+            "attachments": "Вложения",
+            "removeAttachment": "Удалить вложение {{name}}"
+        }
     },
     "historyBuckets": {
         "today": "Сегодня",
@@ -68,5 +74,30 @@
         "withinTwoWeeks": "В течение 2 недель",
         "withinMonth": "В течение месяца",
         "older": "Старее месяца"
+    },
+    "a11y": {
+        "log": "Сообщения чата",
+        "message": {
+            "author": {
+                "user": "Вы",
+                "assistant": "Ассистент",
+                "system": "Система"
+            }
+        },
+        "streaming": {
+            "typing": "Ассистент печатает"
+        },
+        "tool": {
+            "running": "Инструмент выполняется:",
+            "success": "Инструмент завершён:",
+            "error": "Инструмент завершился с ошибкой:"
+        },
+        "codeBlock": "Блок кода, {{lang}}",
+        "codeBlockPlain": "Блок кода",
+        "copyCode": "Скопировать код в буфер обмена",
+        "attachmentImage": "Изображение-вложение: {{name}}",
+        "thinking": {
+            "toggle": "Показать ход мысли"
+        }
     }
 }

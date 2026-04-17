@@ -90,6 +90,11 @@ export function ConfirmDialog({
   };
 
   return (
+    // Dialog wrapper: `role="dialog"` makes this an ARIA widget, and the
+    // onKeyDown handler captures Escape bubbling from any descendant. This is
+    // the standard modal-dialog pattern; the lint rule can't see that the
+    // role upgrades the div to an interactive widget.
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       role="dialog"

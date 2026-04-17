@@ -134,6 +134,9 @@ Skills 页面可展示来自多个 OpenClaw 来源的技能（托管目录、wor
 ### 🚀 开机启动控制
 在 **设置 → 通用** 中，你可以开启 **开机自动启动**，让 ClawX 在系统登录后自动启动。
 
+### ♿ 无障碍访问
+ClawX 正在以 WCAG 2.1 AA 标准构建，优先支持屏幕阅读器（VoiceOver、NVDA、JAWS、Orca）与仅键盘操作。每次 PR 都会通过 `eslint-plugin-jsx-a11y` 静态检查和 axe 驱动的单元测试与端到端测试进行验证。当前状态矩阵请参见 [`ACCESSIBILITY.md`](ACCESSIBILITY.md)，完整键盘快捷键请参见 [`docs/keyboard-shortcuts.md`](docs/keyboard-shortcuts.md)。
+
 ---
 
 ## 快速上手

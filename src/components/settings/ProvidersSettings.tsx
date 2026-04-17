@@ -1313,6 +1313,8 @@ function AddProviderDialog({
                     placeholder={typeInfo?.id === 'custom' ? t('aiProviders.custom') : typeInfo?.name}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    aria-required="true"
+                    autoComplete="off"
                     className={inputClasses}
                   />
                 </div>
@@ -1369,20 +1371,27 @@ function AddProviderDialog({
                           setApiKey(e.target.value);
                           setValidationError(null);
                         }}
+                        aria-required={typeInfo?.id !== 'ollama'}
+                        aria-invalid={validationError ? true : undefined}
+                        aria-describedby={validationError ? 'apiKey-error' : 'apiKey-hint'}
+                        autoComplete="off"
+                        spellCheck={false}
                         className={inputClasses}
                       />
                       <button
                         type="button"
                         onClick={() => setShowKey(!showKey)}
+                        aria-label={showKey ? t('aiProviders.dialog.hideKey') : t('aiProviders.dialog.showKey')}
+                        aria-pressed={showKey}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                       >
-                        {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showKey ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
                       </button>
                     </div>
                     {validationError && (
-                      <p className="text-[13px] text-red-500 font-medium">{validationError}</p>
+                      <p id="apiKey-error" role="alert" className="text-[13px] text-red-500 font-medium">{validationError}</p>
                     )}
-                    <p className="text-[12px] text-muted-foreground">
+                    <p id="apiKey-hint" className="text-[12px] text-muted-foreground">
                       {t('aiProviders.dialog.apiKeyStored')}
                     </p>
                   </div>
@@ -1397,6 +1406,9 @@ function AddProviderDialog({
                       placeholder={getProtocolBaseUrlPlaceholder(apiProtocol)}
                       value={baseUrl}
                       onChange={(e) => setBaseUrl(e.target.value)}
+                      autoComplete="off"
+                      spellCheck={false}
+                      inputMode="url"
                       className={inputClasses}
                     />
                   </div>
@@ -1414,6 +1426,9 @@ function AddProviderDialog({
                         setModelId(e.target.value);
                         setValidationError(null);
                       }}
+                      aria-required="true"
+                      autoComplete="off"
+                      spellCheck={false}
                       className={inputClasses}
                     />
                   </div>

@@ -178,3 +178,38 @@
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * Windows High Contrast / `forced-colors` mode.
+ *
+ * When `forced-colors: active`, the OS paints over our custom palette with
+ * the user's system colors. We keep focus rings on system keywords so they
+ * stay visible, and opt SVG icons out of forced color so they still render
+ * their own glyphs rather than being flattened to text color.
+ *
+ * See https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors
+ */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid CanvasText !important;
+    outline-offset: 2px;
+  }
+
+  .sr-only:focus-visible,
+  [data-state='open'] {
+    outline: 2px solid Highlight !important;
+  }
+
+  button,
+  [role='button'],
+  .border,
+  [data-radix-popper-content-wrapper] {
+    border-color: ButtonBorder !important;
+  }
+
+  /* Decorative icons often carry meaning via shape; let the OS keep them. */
+  svg[aria-hidden='true'],
+  svg:not([role='img']) {
+    forced-color-adjust: auto;
+  }
+}

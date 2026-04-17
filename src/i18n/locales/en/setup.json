@@ -148,5 +148,16 @@
             "name": "Terminal",
             "description": "Shell command execution"
         }
+    },
+    "a11y": {
+        "progress": "Setup progress",
+        "progressText": "Step {{current}} of {{total}}: {{title}}",
+        "stepChange": "Step {{current}} of {{total}}: {{title}}",
+        "stepLabel": "Step {{index}} of {{total}}, {{title}}, {{state}}",
+        "stepState": {
+            "completed": "completed",
+            "current": "current",
+            "upcoming": "upcoming"
+        }
     }
 }

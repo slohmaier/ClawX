@@ -2,8 +2,13 @@
  * Vitest Test Setup
  * Global test configuration and mocks
  */
-import { vi } from 'vitest';
+import { expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
+import { toHaveNoViolations } from 'jest-axe';
+
+// Enable `expect(container).toHaveNoViolations()` in a11y tests under
+// tests/unit/a11y/. Individual specs import `axe` from 'jest-axe' directly.
+expect.extend(toHaveNoViolations);
 
 // Provide a minimal `electron` mock so tests that transitively import
 // main-process code (logger, store, etc.) don't blow up when the Electron
@@ -45,6 +50,26 @@ const mockElectron = {
 if (typeof window !== 'undefined') {
   Object.defineProperty(window, 'electron', {
     value: mockElectron,
+    writable: true,
+  });
+}
+
+// Provide an in-memory localStorage so zustand `persist` middleware works in
+// jsdom tests that touch stores like useSettingsStore. jsdom ships a Storage
+// by default, but `vi.resetAllMocks()` in some specs clobbers the methods —
+// define our own that survives resets.
+if (typeof window !== 'undefined') {
+  const store = new Map<string, string>();
+  const localStorageMock: Storage = {
+    get length() { return store.size; },
+    clear: () => { store.clear(); },
+    getItem: (key) => (store.has(key) ? store.get(key)! : null),
+    key: (i) => Array.from(store.keys())[i] ?? null,
+    removeItem: (key) => { store.delete(key); },
+    setItem: (key, value) => { store.set(key, String(value)); },
+  };
+  Object.defineProperty(window, 'localStorage', {
+    value: localStorageMock,
     writable: true,
   });
 }

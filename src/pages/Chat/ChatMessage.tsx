@@ -8,11 +8,14 @@ import { Sparkles, Copy, Check, ChevronDown, ChevronRight, Wrench, FileText, Fil
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { invokeIpc } from '@/lib/api-client';
 import type { RawMessage, AttachedFileMeta } from '@/stores/chat';
 import { extractText, extractThinking, extractImages, extractToolUse, formatTimestamp } from './message-utils';
+
+const srOnly = 'absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0_0_0_0)]';
 
 interface ChatMessageProps {
   message: RawMessage;
@@ -47,9 +50,16 @@ export const ChatMessage = memo(function ChatMessage({
   isStreaming = false,
   streamingTools = [],
 }: ChatMessageProps) {
+  const { t } = useTranslation('chat');
+  const authorId = useId();
   const isUser = message.role === 'user';
   const role = typeof message.role === 'string' ? message.role.toLowerCase() : '';
   const isToolResult = role === 'toolresult' || role === 'tool_result';
+  const authorKey: 'user' | 'assistant' | 'system' = isUser
+    ? 'user'
+    : role === 'system'
+      ? 'system'
+      : 'assistant';
   const text = extractText(message);
   const hasText = text.trim().length > 0;
   const thinking = extractThinking(message);
@@ -72,16 +82,23 @@ export const ChatMessage = memo(function ChatMessage({
   if (!hasText && !visibleThinking && images.length === 0 && visibleTools.length === 0 && attachedFiles.length === 0 && !hasStreamingToolStatus) return null;
 
   return (
-    <div
+    <article
+      aria-labelledby={authorId}
       className={cn(
         'flex gap-3 group',
         isUser ? 'flex-row-reverse' : 'flex-row',
       )}
     >
-      {/* Avatar */}
+      {/* SR-only author label — gives the message an accessible name even
+          though the visual design relies on bubble position/avatar. */}
+      <span id={authorId} className={srOnly}>
+        {t(`a11y.message.author.${authorKey}`)}
+      </span>
+
+      {/* Avatar (decorative — the SR-only author label above carries the name) */}
       {!isUser && (
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full mt-1 bg-black/5 dark:bg-white/5 text-foreground">
-          <Sparkles className="h-4 w-4" />
+          <Sparkles className="h-4 w-4" aria-hidden="true" />
         </div>
       )}
 
@@ -246,7 +263,7 @@ export const ChatMessage = memo(function ChatMessage({
           onClose={() => setLightboxImg(null)}
         />
       )}
-    </div>
+    </article>
   );
 });
 
@@ -268,15 +285,21 @@ function ToolStatusBar({
     summary?: string;
   }>;
 }) {
+  const { t } = useTranslation('chat');
   return (
     <div className="w-full space-y-1">
       {tools.map((tool) => {
         const duration = formatDuration(tool.durationMs);
         const isRunning = tool.status === 'running';
         const isError = tool.status === 'error';
+        const statusKey = isError ? 'error' : isRunning ? 'running' : 'success';
+        // `role=status` + polite live-region announces tool state transitions
+        // when the card swaps between running → success/error.
         return (
           <div
             key={tool.toolCallId || tool.id || tool.name}
+            role="status"
+            aria-live="polite"
             className={cn(
               'flex items-center gap-2 rounded-lg border px-3 py-2 text-xs transition-colors',
               isRunning && 'border-primary/30 bg-primary/5 text-foreground',
@@ -288,9 +311,7 @@ function ToolStatusBar({
             {!isRunning && !isError && <CheckCircle2 className="h-3.5 w-3.5 text-green-500 shrink-0" aria-hidden="true" />}
             {isError && <AlertCircle className="h-3.5 w-3.5 text-destructive shrink-0" aria-hidden="true" />}
             <Wrench className="h-3 w-3 shrink-0 opacity-60" aria-hidden="true" />
-            <span className="sr-only">
-              {isError ? 'Error' : isRunning ? 'Running' : 'Completed'}:
-            </span>
+            <span className={srOnly}>{t(`a11y.tool.${statusKey}`)}</span>
             <span className="font-mono text-[12px] font-medium">{tool.name}</span>
             {duration && <span className="text-[11px] opacity-60">{tool.summary ? `(${duration})` : duration}</span>}
             {tool.summary && (
@@ -306,6 +327,7 @@ function ToolStatusBar({
 // ── Assistant hover bar (timestamp + copy, shown on group hover) ─
 
 function AssistantHoverBar({ text, timestamp }: { text: string; timestamp?: number }) {
+  const { t } = useTranslation('chat');
   const [copied, setCopied] = useState(false);
 
   const copyContent = useCallback(() => {
@@ -324,8 +346,11 @@ function AssistantHoverBar({ text, timestamp }: { text: string; timestamp?: numb
         size="icon"
         className="h-6 w-6"
         onClick={copyContent}
+        aria-label={t('a11y.copyCode')}
       >
-        {copied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+        {copied
+          ? <Check className="h-3 w-3 text-green-500" aria-hidden="true" />
+          : <Copy className="h-3 w-3" aria-hidden="true" />}
       </Button>
     </div>
   );
@@ -342,6 +367,7 @@ function MessageBubble({
   isUser: boolean;
   isStreaming: boolean;
 }) {
+  const { t } = useTranslation('chat');
   return (
     <div
       className={cn(
@@ -369,12 +395,23 @@ function MessageBubble({
                     </code>
                   );
                 }
+                const lang = match ? match[1] : '';
+                const caption = lang
+                  ? t('a11y.codeBlock', { lang })
+                  : t('a11y.codeBlockPlain');
                 return (
-                  <pre className="bg-background/50 rounded-lg p-4 overflow-x-auto">
-                    <code className={cn('text-sm font-mono', className)} {...props}>
-                      {children}
-                    </code>
-                  </pre>
+                  // `figure` gives SRs a landmark they can announce; the
+                  // sr-only caption carries the language so keyboard users
+                  // know what block they're entering without seeing the
+                  // syntax-highlight class.
+                  <figure aria-label={caption} className="my-2">
+                    <figcaption className={srOnly}>{caption}</figcaption>
+                    <pre className="bg-background/50 rounded-lg p-4 overflow-x-auto">
+                      <code className={cn('text-sm font-mono', className)} {...props}>
+                        {children}
+                      </code>
+                    </pre>
+                  </figure>
                 );
               },
               a({ href, children }) {
@@ -391,7 +428,9 @@ function MessageBubble({
           {isStreaming && (
             <>
               <span className="inline-block w-2 h-4 bg-foreground/50 animate-pulse ml-0.5" aria-hidden="true" />
-              <span className="sr-only" role="status" aria-live="polite">Assistant is typing</span>
+              <span className="sr-only" role="status" aria-live="polite">
+                {t('a11y.streaming.typing')}
+              </span>
             </>
           )}
         </div>

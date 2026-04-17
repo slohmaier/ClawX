@@ -55,5 +55,86 @@
         "notRunning": "Gateway Not Running",
         "notRunningDesc": "The OpenClaw Gateway needs to be running to use this feature. It will start automatically, or you can start it from Settings.",
         "warning": "Gateway is not running."
+    },
+    "a11y": {
+        "skipToContent": "Skip to main content",
+        "skipToSidebar": "Skip to sidebar",
+        "sidebar": {
+            "nav": "Primary navigation",
+            "sessions": "Chat sessions",
+            "deleteSession": "Delete session {{label}}",
+            "collapse": "Collapse sidebar",
+            "expand": "Expand sidebar"
+        },
+        "toasts": {
+            "region": "Notifications",
+            "dismiss": "Dismiss notification"
+        },
+        "connection": {
+            "connected": "Gateway connected",
+            "disconnected": "Gateway disconnected",
+            "reconnecting": "Reconnecting to gateway"
+        },
+        "streaming": {
+            "complete": "Assistant reply complete"
+        },
+        "tool": {
+            "errorAnnouncement": "Tool {{name}} failed"
+        }
+    },
+    "shortcuts": {
+        "dialogTitle": "Keyboard shortcuts",
+        "dialogDescription": "All keyboard shortcuts available throughout ClawX.",
+        "close": "Close shortcuts dialog",
+        "scope": {
+            "global": "Global",
+            "chat": "Chat",
+            "sidebar": "Sidebar",
+            "modal": "Modals"
+        },
+        "help": {
+            "open": {
+                "label": "Show shortcuts",
+                "description": "Open this keyboard shortcuts reference"
+            }
+        },
+        "command": {
+            "palette": {
+                "label": "Command palette",
+                "description": "Open command / session search"
+            }
+        },
+        "sidebar": {
+            "toggle": {
+                "label": "Toggle sidebar",
+                "description": "Show or hide the sidebar"
+            }
+        },
+        "settings": {
+            "open": {
+                "label": "Open settings",
+                "description": "Jump to the settings page"
+            }
+        },
+        "chat": {
+            "new": {
+                "label": "New chat",
+                "description": "Start a new chat session"
+            },
+            "send": {
+                "label": "Send message",
+                "description": "Send the current message"
+            },
+            "newline": {
+                "label": "Insert newline",
+                "description": "Insert a line break without sending"
+            }
+        },
+        "modal": {
+            "close": {
+                "label": "Close modal",
+                "description": "Close the active modal or popover"
+            }
+        }
     }
 }

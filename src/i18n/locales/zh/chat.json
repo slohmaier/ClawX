@@ -59,7 +59,13 @@
         "stop": "停止",
         "gatewayConnected": "已连接",
         "gatewayStatus": "gateway {{state}} | port: {{port}} {{pid}}",
-        "retryFailedAttachments": "重试失败的附件"
+        "retryFailedAttachments": "重试失败的附件",
+        "a11y": {
+            "inputLabel": "消息",
+            "inputHint": "Enter 发送，Shift+Enter 换行，@ 提及代理。",
+            "attachments": "附件",
+            "removeAttachment": "移除附件 {{name}}"
+        }
     },
     "historyBuckets": {
         "today": "今天",
@@ -68,5 +74,30 @@
         "withinTwoWeeks": "两周内",
         "withinMonth": "一个月内",
         "older": "一个月之前"
+    },
+    "a11y": {
+        "log": "聊天消息",
+        "message": {
+            "author": {
+                "user": "你",
+                "assistant": "助手",
+                "system": "系统"
+            }
+        },
+        "streaming": {
+            "typing": "助手正在输入"
+        },
+        "tool": {
+            "running": "工具运行中：",
+            "success": "工具已完成：",
+            "error": "工具失败："
+        },
+        "codeBlock": "代码块，{{lang}}",
+        "codeBlockPlain": "代码块",
+        "copyCode": "复制代码到剪贴板",
+        "attachmentImage": "图片附件：{{name}}",
+        "thinking": {
+            "toggle": "显示思考过程"
+        }
     }
 }

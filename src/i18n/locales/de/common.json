@@ -1,0 +1,140 @@
+{
+    "sidebar": {
+        "chat": "Chat",
+        "newChat": "Neuer Chat",
+        "cronTasks": "Cron-Aufgaben",
+        "skills": "Skills",
+        "agents": "Agenten",
+        "channels": "Kanäle",
+        "dashboard": "Dashboard",
+        "settings": "Einstellungen",
+        "devConsole": "Entwicklerkonsole",
+        "models": "Modelle",
+        "deleteSessionConfirm": "Möchtest du die Sitzung \"{{label}}\" wirklich löschen?",
+        "openClawPage": "OpenClaw-Seite"
+    },
+    "actions": {
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "delete": "Löschen",
+        "edit": "Bearbeiten",
+        "refresh": "Aktualisieren",
+        "close": "Schließen",
+        "copy": "Kopieren",
+        "search": "Suchen",
+        "confirm": "Bestätigen",
+        "dismiss": "Verwerfen",
+        "load": "Laden",
+        "install": "Installieren",
+        "uninstall": "Deinstallieren",
+        "enable": "Aktivieren",
+        "disable": "Deaktivieren",
+        "back": "Zurück",
+        "next": "Weiter",
+        "skip": "Überspringen",
+        "restart": "Neu starten",
+        "show": "Anzeigen",
+        "hide": "Verbergen",
+        "clear": "Leeren"
+    },
+    "status": {
+        "running": "Läuft",
+        "stopped": "Gestoppt",
+        "error": "Fehler",
+        "connected": "Verbunden",
+        "disconnected": "Getrennt",
+        "enabled": "Aktiv",
+        "disabled": "Inaktiv",
+        "active": "Aktiv",
+        "paused": "Pausiert",
+        "configured": "Konfiguriert",
+        "loading": "Lädt …",
+        "saving": "Speichert …"
+    },
+    "gateway": {
+        "notRunning": "Gateway läuft nicht",
+        "notRunningDesc": "Das OpenClaw-Gateway muss laufen, um diese Funktion zu nutzen. Es startet automatisch oder du kannst es in den Einstellungen starten.",
+        "warning": "Gateway läuft nicht."
+    },
+    "a11y": {
+        "skipToContent": "Zum Hauptinhalt springen",
+        "skipToSidebar": "Zur Seitenleiste springen",
+        "sidebar": {
+            "nav": "Hauptnavigation",
+            "sessions": "Chat-Sitzungen",
+            "deleteSession": "Sitzung {{label}} löschen",
+            "collapse": "Seitenleiste einklappen",
+            "expand": "Seitenleiste ausklappen"
+        },
+        "toasts": {
+            "region": "Benachrichtigungen",
+            "dismiss": "Benachrichtigung schließen"
+        },
+        "connection": {
+            "connected": "Gateway verbunden",
+            "disconnected": "Gateway getrennt",
+            "reconnecting": "Verbindung zum Gateway wird wiederhergestellt"
+        },
+        "streaming": {
+            "complete": "Antwort des Assistenten abgeschlossen"
+        },
+        "tool": {
+            "errorAnnouncement": "Tool {{name}} fehlgeschlagen"
+        }
+    },
+    "shortcuts": {
+        "dialogTitle": "Tastaturkürzel",
+        "dialogDescription": "Alle Tastaturkürzel, die in ClawX verfügbar sind.",
+        "close": "Tastaturkürzel-Dialog schließen",
+        "scope": {
+            "global": "Global",
+            "chat": "Chat",
+            "sidebar": "Seitenleiste",
+            "modal": "Dialoge"
+        },
+        "help": {
+            "open": {
+                "label": "Kürzel anzeigen",
+                "description": "Diese Übersicht der Tastaturkürzel öffnen"
+            }
+        },
+        "command": {
+            "palette": {
+                "label": "Befehlspalette",
+                "description": "Befehls- / Sitzungssuche öffnen"
+            }
+        },
+        "sidebar": {
+            "toggle": {
+                "label": "Seitenleiste umschalten",
+                "description": "Seitenleiste ein- oder ausblenden"
+            }
+        },
+        "settings": {
+            "open": {
+                "label": "Einstellungen öffnen",
+                "description": "Zur Seite „Einstellungen“ springen"
+            }
+        },
+        "chat": {
+            "new": {
+                "label": "Neuer Chat",
+                "description": "Neue Chat-Sitzung starten"
+            },
+            "send": {
+                "label": "Nachricht senden",
+                "description": "Aktuelle Nachricht senden"
+            },
+            "newline": {
+                "label": "Zeilenumbruch einfügen",
+                "description": "Zeilenumbruch einfügen, ohne zu senden"
+            }
+        },
+        "modal": {
+            "close": {
+                "label": "Dialog schließen",
+                "description": "Aktiven Dialog oder Popover schließen"
+            }
+        }
+    }
+}

@@ -40,6 +40,11 @@ jobs:
       - name: Run tests
         run: pnpm run test
 
+      - name: Run a11y tests (jest-axe)
+        # Redundant with `pnpm run test` (same specs), but kept as an explicit
+        # CI step so accessibility regressions surface with a clear name.
+        run: pnpm run test:a11y
+
   build:
     runs-on: windows-latest
     env:

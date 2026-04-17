@@ -148,5 +148,16 @@
             "name": "终端",
             "description": "Shell 命令执行"
         }
+    },
+    "a11y": {
+        "progress": "设置进度",
+        "progressText": "第 {{current}} 步，共 {{total}} 步：{{title}}",
+        "stepChange": "第 {{current}} 步，共 {{total}} 步：{{title}}",
+        "stepLabel": "第 {{index}} 步，共 {{total}} 步，{{title}}，{{state}}",
+        "stepState": {
+            "completed": "已完成",
+            "current": "当前",
+            "upcoming": "未开始"
+        }
     }
 }
