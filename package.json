@@ -1,6 +1,6 @@
 {
     "name": "clawx",
-    "version": "0.3.9",
+    "version": "0.3.10-beta.1",
     "pnpm": {
         "onlyBuiltDependencies": [
             "@discordjs/opus",
@@ -57,7 +57,7 @@
         "node:download:win": "zx scripts/download-bundled-node.mjs --platform=win",
         "prep:win-binaries": "pnpm run uv:download:win && pnpm run node:download:win",
         "icons": "zx scripts/generate-icons.mjs",
-        "package": "vite build && zx scripts/bundle-openclaw.mjs && zx scripts/bundle-openclaw-plugins.mjs && zx scripts/bundle-preinstalled-skills.mjs",
+        "package": "node scripts/generate-ext-bridge.mjs && vite build && zx scripts/bundle-openclaw.mjs && zx scripts/bundle-openclaw-plugins.mjs && zx scripts/bundle-preinstalled-skills.mjs",
         "package:mac": "pnpm run package && electron-builder --mac --publish never",
         "package:mac:local": "SKIP_PREINSTALLED_SKILLS=1 pnpm run package && electron-builder --mac --publish never",
         "package:win": "pnpm run prep:win-binaries && pnpm run package && electron-builder --win --publish never",
@@ -81,7 +81,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
-        "@larksuite/openclaw-lark": "2026.4.7",
+        "@larksuite/openclaw-lark": "2026.4.8",
         "@playwright/test": "^1.56.1",
         "@radix-ui/react-dialog": "^1.1.15",
         "@radix-ui/react-dropdown-menu": "^2.1.16",
