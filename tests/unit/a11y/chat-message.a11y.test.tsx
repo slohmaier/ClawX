@@ -49,15 +49,38 @@ function assistantMessage(text: string): RawMessage {
 }
 
 describe('ChatMessage a11y', () => {
-  it('renders user messages inside an <article> labelled by an sr-only author', () => {
+  it('renders user messages inside an <article> with an sr-only author label as first child', () => {
     render(<ChatMessage message={userMessage('hello world')} showThinking={false} />);
-    const article = screen.getByRole('article', { name: 'You' });
+    // The article deliberately has no aria-labelledby: VoiceOver should read
+    // the whole message content (author + bubble text) on focus, not just
+    // the author name. We check structurally that it *is* an article and
+    // that the author text appears inside it.
+    const article = screen.getByRole('article');
     expect(article).toBeInTheDocument();
+    expect(article.textContent).toContain('You');
+    expect(article.textContent).toContain('hello world');
   });
 
   it('labels assistant messages with the localised assistant author', () => {
     render(<ChatMessage message={assistantMessage('sure, let me help')} showThinking={false} />);
-    expect(screen.getByRole('article', { name: 'Assistant' })).toBeInTheDocument();
+    const article = screen.getByRole('article');
+    expect(article.textContent).toContain('Assistant');
+    expect(article.textContent).toContain('sure, let me help');
+  });
+
+  it('exposes id and tabIndex props on the article for VO focus targeting', () => {
+    render(
+      <ChatMessage
+        message={assistantMessage('focus me')}
+        showThinking={false}
+        id="chat-message-5"
+        tabIndex={-1}
+      />
+    );
+    const article = screen.getByRole('article');
+    expect(article).toHaveAttribute('id', 'chat-message-5');
+    expect(article).toHaveAttribute('tabIndex', '-1');
+    expect(article).toHaveAttribute('data-chat-message-role', 'assistant');
   });
 
   it('exposes a polite streaming status while the assistant is typing', () => {

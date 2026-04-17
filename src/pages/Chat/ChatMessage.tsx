@@ -31,6 +31,10 @@ interface ChatMessageProps {
     durationMs?: number;
     summary?: string;
   }>;
+  /** Stable DOM id for VoiceOver / keyboard focus targeting. */
+  id?: string;
+  /** Forwarded tabIndex — set to -1 so the article is programmatically focusable. */
+  tabIndex?: number;
 }
 
 interface ExtractedImage { url?: string; data?: string; mimeType: string; }
@@ -49,6 +53,8 @@ export const ChatMessage = memo(function ChatMessage({
   suppressProcessAttachments = false,
   isStreaming = false,
   streamingTools = [],
+  id,
+  tabIndex,
 }: ChatMessageProps) {
   const { t } = useTranslation('chat');
   const authorId = useId();
@@ -83,14 +89,24 @@ export const ChatMessage = memo(function ChatMessage({
 
   return (
     <article
-      aria-labelledby={authorId}
+      id={id}
+      tabIndex={tabIndex}
+      data-chat-message-role={message.role}
       className={cn(
-        'flex gap-3 group',
+        'flex gap-3 group focus:outline-none',
         isUser ? 'flex-row-reverse' : 'flex-row',
       )}
     >
-      {/* SR-only author label — gives the message an accessible name even
-          though the visual design relies on bubble position/avatar. */}
+      {/*
+        SR-only author label as the *first child* of the article — when
+        VoiceOver focuses the article it reads children in order, so the
+        user hears "Assistant, <bubble text>, …" naturally.
+
+        Historical note: we used to point `aria-labelledby` at this span,
+        but that made the article's accessible name exactly "Assistant" and
+        VoiceOver stopped there without reading the reply content. Letting
+        VO fall back to descendants' visible text reads the whole message.
+      */}
       <span id={authorId} className={srOnly}>
         {t(`a11y.message.author.${authorKey}`)}
       </span>

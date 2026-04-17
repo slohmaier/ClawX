@@ -237,13 +237,17 @@ export function Chat() {
       <div className="min-h-0 flex-1 overflow-hidden px-4 py-4">
         <div className="mx-auto flex h-full min-h-0 max-w-6xl flex-col gap-4 lg:flex-row lg:items-stretch">
           <div ref={scrollRef} className="min-h-0 min-w-0 flex-1 overflow-y-auto">
+            {/*
+              Historical note: we used `role="log"` + aria-live here, which
+              VoiceOver rendered as a single grouped region — users couldn't
+              VO-navigate between individual messages. Announcements are
+              already handled by the app's dedicated LiveRegion (driven from
+              useAppAnnouncements), so dropping role+aria-live on the chat
+              container lets each <article> become its own VoiceOver stop.
+            */}
             <div
               ref={contentRef}
               className="max-w-4xl space-y-4"
-              role="log"
-              aria-live="polite"
-              aria-relevant="additions"
-              aria-atomic="false"
               aria-label={t('a11y.log')}
             >
               {isEmpty ? (
@@ -258,7 +262,6 @@ export function Chat() {
                     <div
                       key={msg.id || `msg-${idx}`}
                       className="space-y-3"
-                      id={`chat-message-${idx}`}
                       data-testid={`chat-message-${idx}`}
                     >
                       <ChatMessage
@@ -266,6 +269,8 @@ export function Chat() {
                         showThinking={showThinking}
                         suppressToolCards={suppressToolCards}
                         suppressProcessAttachments={suppressToolCards}
+                        id={`chat-message-${idx}`}
+                        tabIndex={-1}
                       />
                       {userRunCards
                         .filter((card) => card.triggerIndex === idx)
